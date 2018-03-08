@@ -128,7 +128,7 @@ def is_amount(argument):
     return True
 
 def on_tweet(status):
-    if status.text.find("RT") == -1 and status.text.find("RT") == -1 and status.user.screen_name != "tipkotone":
+    if status.text.find("RT") == -1 and status.text.find("QT") == -1 and status.user.screen_name != "tipkotone":
         if status.text.find("@tipkotone") == -1:
             return
 
