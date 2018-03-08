@@ -6,34 +6,36 @@ help/ヘルプ
 
 ここへ誘導する
 
-    @tipkoto help
-    @tipkoto ヘルプ
+    @tipkotone help
+    @tipkotone ヘルプ
 
 Hello/Hi/こんにちは/はじめまして
 --------------------------------
 
 このTipBotを使うには先ずこれをする
 
-    @tipkoto Hello
-    @tipkoto Hi
-    @tipkoto こんにちは
-    @tipkoto はじめまして
+    @tipkotone hello
+    @tipkotone hi
+    @tipkotone address
+    @tipkotone こんにちは
+    @tipkotone はじめまして
+    @tipkotone アドレス
 
 balance 残高
 -------------
 
 残高を確認する
 
-    @tipkoto balance
-    @tipkoto 残高
+    @tipkotone balance
+    @tipkotone 残高
 
 deposit/入金
 ------------
 
 入金用アドレスを確認する
 
-    @tipkoto deposit
-    @tipkoto 入金
+    @tipkotone deposit
+    @tipkotone 入金
 
 withdraw/出金
 -------------
@@ -42,10 +44,10 @@ withdraw/出金
 zアドレスへは出金できません。  
 出金額には all が使えます。
 
-    @tipkoto withdraw 10 address
-    @tipkoto withdraw all address
-    @tipkoto 出金 39 address
-    @tipkoto 出金 all address
+    @tipkotone withdraw 10 address
+    @tipkotone withdraw all address
+    @tipkotone 出金 39 address
+    @tipkotone 出金 all address
 
 tip/投げ銭/投銭
 ---------------
@@ -54,8 +56,8 @@ tip/投げ銭/投銭
 相手がまだ Hello/Hi/こんにちは/はじめまして をしていないと投げ銭できません。  
 投銭額には all が使えます。
 
-    @tipkoto tip 4.649 @to_twitter_account
-    @tipkoto 投げ銭 all @to_twitter_account 全額投げます！！！
+    @tipkotone tip 4.649 @to_twitter_account
+    @tipkotone 投げ銭 all @to_twitter_account 全額投げます！！！
 
 トラブルシューティング
 ======================
