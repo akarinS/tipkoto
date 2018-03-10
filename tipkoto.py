@@ -142,33 +142,10 @@ def on_tweet(status):
             tweet = "@" + screen_name + " tipkotoの使い方はこちら！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
 
         elif user_exists(user_id):
-            if re.search("balance", command.lower()) or re.search("残高", command):
-                logger.info("%s(@%s) Balance" % (name, screen_name))
-                balance, confirming_balance = get_balance_of(user_id)
-                logger.info("--> {0:f}KOTO ".format(balance) + "(+{0:f}KOTO confirming)".format(confirming_balance))
-
-                if confirming_balance == 0:
-                    tweet = "@" + screen_name + " " + name + "さんの残高は {0:f}KOTO です！".format(balance)
-
-                else:
-                    tweet = "@" + screen_name + " " + name + "さんの残高は {0:f}KOTO ".format(balance) + "(+{0:f}KOTO confirming) です！".format(confirming_balance)
-
-            elif re.search("deposit", command.lower()) or re.search("入金", command):
-                logger.info("%s(@%s) Deposit" % (name, screen_name))
-                address = get_address_of(user_id)
-                logger.info("--> " + address)
-                tweet = "@" + screen_name + " このアドレスに送金してね！ " + address
-
-            elif re.search("address", command.lower()) or re.search("アドレス", command):
-                logger.info("%s(@%s) Address" % (name, screen_name))
-                address = get_address_of(user_id)
-                logger.info("--> " + address)
-                tweet = "@" + screen_name + " " + name + "さんのアドレスはこちら！ " + address
-
-            elif re.match("withdraw", command.lower()) or re.match("出金", command):
+            if re.match("withdraw", command.lower()) or re.match("出金", command):
                 logger.info("%s(@%s) Withdraw" % (name, screen_name))
 
-                command_arguments = command.split(" ")
+                command_arguments = re.split(" +", command.replace("\n", " "))
 
                 if len(command_arguments) < 3:
                     logger.info("--> Arguments shortage")
@@ -216,7 +193,7 @@ def on_tweet(status):
 
             elif re.match("tip", command.lower()) or re.match("投げ銭", command) or re.match("投銭", command):
                 logger.info("%s(@%s) Tip" % (name, screen_name))
-                command_arguments = command.split(" ")
+                command_arguments = re.split(" +", command.replace("\n", " "))
 
                 if len(command_arguments) < 3:
                     logger.info("--> Arguments shortage")
@@ -280,6 +257,29 @@ def on_tweet(status):
                     else:
                         logger.info("--> To user has not used tipkoto yet")
                         tweet = "@" + screen_name + " %s（@%s）" % (to_name, to_screen_name) + "さんはtipkotoをまだ使ってないみたい・・・"
+
+            elif re.search("balance", command.lower()) or re.search("残高", command):
+                logger.info("%s(@%s) Balance" % (name, screen_name))
+                balance, confirming_balance = get_balance_of(user_id)
+                logger.info("--> {0:f}KOTO ".format(balance) + "(+{0:f}KOTO confirming)".format(confirming_balance))
+
+                if confirming_balance == 0:
+                    tweet = "@" + screen_name + " " + name + "さんの残高は {0:f}KOTO です！".format(balance)
+
+                else:
+                    tweet = "@" + screen_name + " " + name + "さんの残高は {0:f}KOTO ".format(balance) + "(+{0:f}KOTO confirming) です！".format(confirming_balance)
+
+            elif re.search("deposit", command.lower()) or re.search("入金", command):
+                logger.info("%s(@%s) Deposit" % (name, screen_name))
+                address = get_address_of(user_id)
+                logger.info("--> " + address)
+                tweet = "@" + screen_name + " このアドレスに送金してね！ " + address
+
+            elif re.search("address", command.lower()) or re.search("アドレス", command):
+                logger.info("%s(@%s) Address" % (name, screen_name))
+                address = get_address_of(user_id)
+                logger.info("--> " + address)
+                tweet = "@" + screen_name + " " + name + "さんのアドレスはこちら！ " + address
 
             elif re.search("hello", command.lower()) or re.search("Hi", command.lower()) or re.search("こんにちは", command):
                 tweet = "@" + screen_name + " こんにちは！"
