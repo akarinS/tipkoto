@@ -141,6 +141,19 @@ def on_tweet(status):
             logger.info("%s(@%s) Help" % (name, screen_name))
             tweet = "@" + screen_name + " tipkotoの使い方はこちら！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
 
+        elif re.match("follow me", command.lower()) or re.match("フォローミー", command):
+            logger.info("%s(@%s) Follow me" % (name, screen_name))
+
+            user = api.get_user(screen_name)
+            if not user.following:
+                api.create_friendship(screen_name)
+                logger.info("--> Follow")
+                tweet = "@" + screen_name + " フォローしました！"
+
+            else:
+                logger.info("--> Already follow")
+                tweet = "@" + screen_name + " すでにフォローしています！"
+
         elif user_exists(user_id):
             if re.match("withdraw", command.lower()) or re.match("出金", command):
                 logger.info("%s(@%s) Withdraw" % (name, screen_name))
@@ -205,6 +218,20 @@ def on_tweet(status):
 
                 else:
                     to_screen_name = command_arguments[2][1:]
+
+                    if to_screen_name == screen_name:
+                        logger.info("--> To user is from user")
+                        tweet = "@" + screen_name + " 自分自身には投げ銭できません！"
+                        tweet = tweet + "\n\n" + ''.join([random.choice(string.ascii_letters + string.digits) for i in range(8)])
+                        api.update_status(status = tweet, in_reply_to_status_id = status.id)
+                        return
+
+                    if to_screen_name == "tipkotone":
+                        logger.info("--> No thank you but I appreciate it")
+                        tweet = "@" + screen_name + " お気持ちだけでうれしいです！ ありがとう！"
+                        tweet = tweet + "\n\n" + ''.join([random.choice(string.ascii_letters + string.digits) for i in range(8)])
+                        api.update_status(status = tweet, in_reply_to_status_id = status.id)
+                        return
 
                     try:
                         to_user = api.get_user(to_screen_name)
