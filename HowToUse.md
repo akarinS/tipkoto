@@ -14,7 +14,7 @@ help/ヘルプ
     @tipkotone help
     @tipkotone ヘルプ
 
-Hello/Hi/こんにちは/はじめまして
+hello/hi/address/こんにちは/はじめまして/アドレス
 --------------------------------
 
 このTipBotを使うには先ずこれをする
@@ -26,7 +26,7 @@ Hello/Hi/こんにちは/はじめまして
     @tipkotone はじめまして
     @tipkotone アドレス
 
-balance 残高
+balance/残高
 -------------
 
 残高を確認する
@@ -34,13 +34,16 @@ balance 残高
     @tipkotone balance
     @tipkotone 残高
 
-deposit/入金
-------------
+deposit/address/入金/アドレス
+-----------------------------
 
 入金用アドレスを確認する
 
     @tipkotone deposit
     @tipkotone 入金
+    @tipkotone address
+    @tipkotone アドレス
+
 
 withdraw/出金
 -------------
@@ -58,8 +61,8 @@ tip/投げ銭/投銭
 ---------------
 
 投げ銭する。  
-相手がまだ Hello/Hi/こんにちは/はじめまして をしていないと投げ銭できません。  
-投銭額には all が使えます。
+相手がまだ hello/hi/address/こんにちは/はじめまして/アドレス をしていないと投げ銭できません。  
+投げ銭額には all が使えます。
 
     @tipkotone tip 4.649 @to_twitter_account
     @tipkotone 投げ銭 all @to_twitter_account 全額投げます！！！
