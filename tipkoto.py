@@ -248,7 +248,7 @@ def on_tweet(status):
 
                     if user_exists(to_user_id):
                         if is_amount(command_arguments[1]):
-                            balance, _ = get_balance_of(user_id)
+                            balance, confirming_balance = get_balance_of(user_id)
 
                             if command_arguments[1].lower() == "all" or command_arguments[1] == "全額":
                                 amount = balance - Decimal("0.0001")
