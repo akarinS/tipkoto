@@ -72,9 +72,12 @@ tip/投げ銭/投銭
 投げ銭する。  
 相手がまだ hello/hi/address/こんにちは/はじめまして/アドレス をしていないと投げ銭できません。  
 投げ銭額には all が使えます。
+投げ銭額とユーザー名は逆にしても利用できます。
 
     @tipkotone tip 4.649 @to_twitter_account
     @tipkotone 投げ銭 all @to_twitter_account 全額投げます！！！
+    @tipkotone tip @to_twitter_account 4.649
+    @tipkotone 投げ銭 @to_twitter_account all 全額投げます！！！
 
 トラブルシューティング
 ======================
