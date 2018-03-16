@@ -212,12 +212,25 @@ def on_tweet(status):
                     logger.info("--> Arguments shortage")
                     tweet = "@" + screen_name + " tipkotoの使い方はこちら！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
                     
-                elif not command_arguments[2].startswith("@"):
+                elif not command_arguments[1].startswith("@") and not command_arguments[2].startswith("@"):
                     logger.info("--> To screen name is incorrect")
                     tweet = "@" + screen_name + " tipkotoの使い方はこちら！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
 
                 else:
-                    to_screen_name = command_arguments[2][1:]
+                    to_screen_name = ""
+                    specified_amount = ""
+                    if command_arguments[1].startswith("@"):
+                        to_screen_name = command_arguments[1][1:]
+                        specified_amount = command_arguments[2]
+                    elif command_arguments[2].startswith("@"):
+                        to_screen_name = command_arguments[2][1:]
+                        specified_amount = command_arguments[1]
+                    else:
+                        logger.info("--> To screen name is incorrect")
+                        tweet = "@" + screen_name + " tipkotoの使い方はこちら！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
+                        tweet = tweet + "\n\n" + ''.join([random.choice(string.ascii_letters + string.digits) for i in range(8)])
+                        api.update_status(status = tweet, in_reply_to_status_id = status.id)
+                        return
 
                     if to_screen_name == screen_name:
                         logger.info("--> To user is from user")
@@ -247,14 +260,14 @@ def on_tweet(status):
                     to_user_id = "twitter-tipkotone-" + str(to_user.id)
 
                     if user_exists(to_user_id):
-                        if is_amount(command_arguments[1]):
+                        if is_amount(specified_amount):
                             balance, confirming_balance = get_balance_of(user_id)
 
-                            if command_arguments[1].lower() == "all" or command_arguments[1] == "全額":
+                            if specified_amount.lower() == "all" or specified_amount == "全額":
                                 amount = balance - Decimal("0.0001")
 
                             else:
-                                amount = Decimal("{0:.8f}".format(float(command_arguments[1])))
+                                amount = Decimal("{0:.8f}".format(float(specified_amount)))
 
                             change = balance - amount - Decimal("0.0001")
 
