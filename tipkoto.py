@@ -34,6 +34,7 @@ api = API(auth)
 logging.config.fileConfig("logging.conf")
 logger = logging.getLogger()
 
+
 def insert_data(user_id):
     database = sqlite3.connect("tipkoto.db")
     db = database.cursor()
@@ -127,6 +128,41 @@ def is_amount(argument):
 
     return True
 
+def get_command(text):
+    text = text.replace("\n", " ")
+    text = text.replace("　", " ")
+
+    while True:
+        place = text.find("@tipkotone")
+
+        if place == -1:
+            return [None]
+
+        else:
+            text = text[place + 11:]
+            command = re.split(" +", text)
+            command[0] = command[0].lower()
+
+            if command[0] in ["withdraw", "出金",
+                              "tip", "投げ銭", "投銭"]:
+
+                return command
+
+            else:
+                for cmd in ["help", "ヘルプ",
+                            "follow me", "フォローミー",
+                            "balance", "残高",
+                            "deposit", "入金",
+                            "address", "アドレス",
+                            "hello", "hi", "こんにちは", "はじめまして"]:
+
+                    if re.match(cmd, text.lower()):
+                        return [cmd]
+
+def send_tweet(tweet, status_id):
+    tweet = tweet + "\n\n" + "".join([random.choice(string.ascii_letters + string.digits) for i in range(8)])
+    api.update_status(status = tweet, in_reply_to_status_id = status_id)
+
 def on_tweet(status):
     if status.text.find("RT") == -1 and status.text.find("QT") == -1 and status.user.screen_name != "tipkotone":
         if status.text.find("@tipkotone") == -1:
@@ -135,15 +171,18 @@ def on_tweet(status):
         name = status.user.name
         screen_name = status.user.screen_name
         user_id = "twitter-tipkotone-" + str(status.user.id)
-        command = status.text[(status.text.find("@tipkotone") + 11):]
+        command = get_command(status.text)
 
-        if re.search("help", command.lower()) or re.search("ヘルプ", command):
+        if command[0] == None:
+            return
+
+        elif command[0] in ["help", "ヘルプ"]:
             logger.info("%s(@%s) Help" % (name, screen_name))
-            tweet = "@" + screen_name + " tipkotoの使い方はこちら！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
+            tweet = "@" + screen_name + " tipkotoneの使い方はこちらです！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
 
-        elif re.match("follow me", command.lower()) or re.match("フォローミー", command):
-            logger.info("%s(@%s) Follow me" % (name, screen_name))
-
+        elif command[0] in ["follow me", "フォローミー"]:
+            logger.info("%s(@%s) Follow")
+            
             user = api.get_user(screen_name)
             if not user.following:
                 api.create_friendship(screen_name)
@@ -151,113 +190,150 @@ def on_tweet(status):
                 tweet = "@" + screen_name + " フォローしました！"
 
             else:
-                logger.info("--> Already follow")
+                logger.info("--> Already Follow")
                 tweet = "@" + screen_name + " すでにフォローしています！"
 
         elif user_exists(user_id):
-            if re.match("withdraw", command.lower()) or re.match("出金", command):
+            if command[0] in ["withdraw", "出金"]:
                 logger.info("%s(@%s) Withdraw" % (name, screen_name))
 
-                command_arguments = re.split(" +", command.replace("\n", " "))
-
-                if len(command_arguments) < 3:
+                if len(command) < 3:
                     logger.info("--> Arguments shortage")
-                    tweet = "@" + screen_name + " tipkotoの使い方はこちら！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
+                    tweet = "@" + screen_name + " tipkotoneの使い方はこちらです！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
 
                 else:
-                    if address_is_ok(command_arguments[2]):
-                        if is_amount(command_arguments[1]):
-                            balance, confirming_balance = get_balance_of(user_id)
+                    balance, confirming_balance = get_balance_of(user_id)
 
-                            if command_arguments[1].lower() == "all" or command_arguments[1] == "全額":
+                    if is_amount(command[1]):
+                        if address_is_ok(command[2]):
+                            if command[1].lower() in ["all", "全額"]:
                                 amount = balance - Decimal("0.0001")
 
                             else:
-                                amount = Decimal("{0:.8f}".format(float(command_arguments[1])))
+                                amount = Decimal("{0:.8f}".format(float(command[1])))
 
-                            change = balance - amount - Decimal("0.0001")
-
-                            if amount_is_ok(balance, amount, change):
-                                from_address = get_address_of(user_id)
-                                to_address = command_arguments[2]
-
-                                params = get_params(from_address, to_address, balance, amount, change)
-                                koto.call("z_sendmany", *params)
-
-                                logger.info("--> {0:f}KOTO ".format(amount) + "to " + to_address)
-
-                                tweet = "@" + screen_name + " {0:f}KOTO を ".format(amount) + to_address + " に出金しました！"
-
-                            elif change < 0:
-                                logger.info("--> Insufficient balance")
-                                tweet = "@" + screen_name + " 残高が足りません・・・ {0:f}KOTO ".format(balance) + "(+{0:f}KOTO confirming)".format(confirming_balance)
-
-                            else:
-                                logger.info("--> Invalid amount")
-                                tweet = "@" + screen_name + " この額では出金できません・・・"
+                            to_address = command[2]
 
                         else:
-                            logger.info("--> Amount argument is incorrect")
-                            tweet = "@" + screen_name + " 数字と認識できませんでした・・・ ちゃんと半角数字になってるか確認してみて！"
+                            logger.info("--> Invalid address")
+                            tweet = "@" + screen_name + " アドレスが間違っています・・・"
+                            send_tweet(tweet, status.id)
+                            return
+
+                    elif is_amount(command[2]):
+                        if address_is_ok(command[1]):
+                            if command[2].lower() in ["all", "全額"]:
+                                amount = balance - Decimal("0.0001")
+
+                            else:
+                                amount = Decimal("{0:.8f}".format(float(command[2])))
+
+                            to_address = command[1]
+
+                        else:
+                            logger.info("--> Invalid address")
+                            tweet = "@" + screen_name + " アドレスが間違っています・・・"
+                            send_tweet(tweet, status.id)
+                            return
 
                     else:
-                        logger.info("--> Invalid address")
-                        tweet = "@" + screen_name + " このアドレスには出金できません・・・"
+                        logger.info("--> Invalid amount")
+                        tweet = "@" + screen_name + " 金額が間違っています・・・"
+                        send_tweet(tweet, status.id)
+                        return
 
-            elif re.match("tip", command.lower()) or re.match("投げ銭", command) or re.match("投銭", command):
+                    change = balance - amount - Decimal("0.0001")
+
+                    if amount_is_ok(balance, amount, change):
+                        from_address = get_address_of(user_id)
+
+                        params = get_params(from_address, to_address, balance, amount, change)
+                        koto.call("z_sendmany", *params)
+
+                        logger.info("--> {0:f}KOTO ".format(amount) + "to " + to_address)
+
+                        tweet = "@" + screen_name + " {0:f}KOTO を ".format(amount) + to_address + " に出金しました！"
+
+                    elif change < 0:
+                        logger.info("--> Insufficient balance")
+                        tweet = "@" + screen_name + " 残高が足りません・・・ {0:f}KOTO ".format(balance) + "(+{0:f}KOTO confirming)".format(confirming_balance)
+
+                    else:
+                        logger.info("--> Invalid amount")
+                        tweet = "@" + screen_name + " この金額では出金できません・・・"
+
+            elif command[0] in ["tip", "投げ銭", "投銭"]:
                 logger.info("%s(@%s) Tip" % (name, screen_name))
-                command_arguments = re.split(" +", command.replace("\n", " "))
 
-                if len(command_arguments) < 3:
+                if len(command) < 3:
                     logger.info("--> Arguments shortage")
-                    tweet = "@" + screen_name + " tipkotoの使い方はこちら！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
-                    
-                elif not command_arguments[2].startswith("@"):
-                    logger.info("--> To screen name is incorrect")
-                    tweet = "@" + screen_name + " tipkotoの使い方はこちら！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
+                    tweet = "@" + screen_name + " tipkotoneの使い方はこちらです！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
 
                 else:
-                    to_screen_name = command_arguments[2][1:]
+                    balance, confirming_balance = get_balance_of(user_id)
+
+                    if is_amount(command[1]):
+                        if command[2].startswith("@"):
+                            if command[1].lower() in ["all", "全額"]:
+                                amount = balance - Decimal("0.0001")
+
+                            else:
+                                amount = Decimal("{0:.8f}".format(float(command[1])))
+
+                            to_screen_name = command[2][1:]
+
+                        else:
+                            logger.info("--> To screen name is incorrect")
+                            tweet = "@" + screen_name + " 宛先が間違っています・・・"
+                            send_tweet(tweet, status.id)
+                            return
+
+                    elif is_amount(command[2]):
+                        if command[1].startswith("@"):
+                            if command[2].lower() in ["all", "全額"]:
+                                amount = balance - Decimal("0.0001")
+
+                            else:
+                                amount = Decimal("{0:.8f}".format(float(command[2])))
+
+                            to_screen_name = command[1][1:]
+
+                        else:
+                            logger.info("--> To screen name is incorrect")
+                            tweet = "@" + screen_name + " 宛先が間違っています・・・"
+                            send_tweet(tweet, status.id)
+                            return
+
+                    else:
+                        logger.info("--> Invalid amount")
+                        tweet = "@" + screen_name + " 金額が間違っています・・・"
+                        send_tweet(tweet, status.id)
+                        return
+
+                    change = balance - amount - Decimal("0.0001")
 
                     if to_screen_name == screen_name:
                         logger.info("--> To user is from user")
                         tweet = "@" + screen_name + " 自分自身には投げ銭できません！"
-                        tweet = tweet + "\n\n" + ''.join([random.choice(string.ascii_letters + string.digits) for i in range(8)])
-                        api.update_status(status = tweet, in_reply_to_status_id = status.id)
-                        return
 
-                    if to_screen_name == "tipkotone":
+                    elif to_screen_name == "tipkotone":
                         logger.info("--> No thank you but I appreciate it")
                         tweet = "@" + screen_name + " お気持ちだけでうれしいです！ ありがとう！"
-                        tweet = tweet + "\n\n" + ''.join([random.choice(string.ascii_letters + string.digits) for i in range(8)])
-                        api.update_status(status = tweet, in_reply_to_status_id = status.id)
-                        return
 
-                    try:
-                        to_user = api.get_user(to_screen_name)
+                    else:
+                        try:
+                            to_user = api.get_user(to_screen_name)
 
-                    except:
-                        logger.info("--> To user is not found")
-                        tweet = "@" + screen_name + " 宛先（@%s）が見つかりませんでした・・・" % (to_screen_name)
-                        tweet = tweet + "\n\n" + ''.join([random.choice(string.ascii_letters + string.digits) for i in range(8)])
-                        api.update_status(status = tweet, in_reply_to_status_id = status.id)
-                        return
+                        except:
+                            logger.info("--> To user is not found")
+                            tweet = "@" + screen_name + " 宛先(@%s)が見つかりませんでした・・・" % (to_screen_name)
+                            send_tweet(tweet, status.id)
+                            return
 
-                    to_name = to_user.name
-                    to_user_id = "twitter-tipkotone-" + str(to_user.id)
+                        to_name = to_user.name
+                        to_user_id = "twitter-tipkotone-" + str(to_user.id)
 
-                    if user_exists(to_user_id):
-                        if is_amount(command_arguments[1]):
-                            balance, confirming_balance = get_balance_of(user_id)
-
-                            if command_arguments[1].lower() == "all" or command_arguments[1] == "全額":
-                                amount = balance - Decimal("0.0001")
-
-                            else:
-                                amount = Decimal("{0:.8f}".format(float(command_arguments[1])))
-
-                            change = balance - amount - Decimal("0.0001")
-
+                        if user_exists(to_user_id):
                             if amount_is_ok(balance, amount, change):
                                 from_address = get_address_of(user_id)
                                 to_address = get_address_of(to_user_id)
@@ -278,14 +354,10 @@ def on_tweet(status):
                                 tweet = "@" + screen_name + " この額では投げ銭できません・・・"
 
                         else:
-                            logger.info("--> Amount argument is incorrect")
-                            tweet = "@" + screen_name + " 数字と認識できませんでした・・・　ちゃんと半角数字になってるか確認してみて！"
+                            logger.info("--> To user has not used tipkotone yet")
+                            tweet = "@" + screen_name + " %s(@%s)" % (to_name, to_screen_name) + "さんはtipkotoneをまだ使ってないみたい・・・"
 
-                    else:
-                        logger.info("--> To user has not used tipkoto yet")
-                        tweet = "@" + screen_name + " %s（@%s）" % (to_name, to_screen_name) + "さんはtipkotoをまだ使ってないみたい・・・"
-
-            elif re.search("balance", command.lower()) or re.search("残高", command):
+            elif command[0] in ["balance", "残高"]:
                 logger.info("%s(@%s) Balance" % (name, screen_name))
                 balance, confirming_balance = get_balance_of(user_id)
                 logger.info("--> {0:f}KOTO ".format(balance) + "(+{0:f}KOTO confirming)".format(confirming_balance))
@@ -296,28 +368,28 @@ def on_tweet(status):
                 else:
                     tweet = "@" + screen_name + " " + name + "さんの残高は {0:f}KOTO ".format(balance) + "(+{0:f}KOTO confirming) です！".format(confirming_balance)
 
-            elif re.search("deposit", command.lower()) or re.search("入金", command):
+            elif command[0] in ["deposit", "入金"]:
                 logger.info("%s(@%s) Deposit" % (name, screen_name))
                 address = get_address_of(user_id)
                 logger.info("--> " + address)
-                tweet = "@" + screen_name + " このアドレスに送金してね！ " + address
+                tweet = "@" + screen_name + " このアドレスに送金してください！ " + address
 
-            elif re.search("address", command.lower()) or re.search("アドレス", command):
+            elif command[0] in ["address", "アドレス"]:
                 logger.info("%s(@%s) Address" % (name, screen_name))
                 address = get_address_of(user_id)
                 logger.info("--> " + address)
-                tweet = "@" + screen_name + " " + name + "さんのアドレスはこちら！ " + address
+                tweet = "@" + screen_name + " " + name + "さんのアドレスはこちらです！ " + address
 
-            elif re.search("hello", command.lower()) or re.search("Hi", command.lower()) or re.search("こんにちは", command):
+            elif command[0] in ["hello", "hi", "こんにちは"]:
                 tweet = "@" + screen_name + " こんにちは！"
 
-            elif re.search("はじめまして", command):
+            elif command[0] == "はじめまして":
                 tweet = "@" + screen_name + " もう！ はじめましてじゃないでしょ！"
 
             else:
                 return
 
-        elif re.search("hello", command.lower()) or re.search("hi", command.lower()) or re.search("こんにちは", command) or re.search("はじめまして", command) or re.search("address", command.lower()) or re.search("アドレス", command):
+        elif command[0] in ["hello", "hi", "address", "こんにちは", "はじめまして", "アドレス"]:
             logger.info("%s(@%s) First contact" % (name, screen_name))
             address = insert_data(user_id)
             logger.info("--> " + address)
@@ -326,8 +398,7 @@ def on_tweet(status):
         else:
             return
 
-        tweet = tweet + "\n\n" + ''.join([random.choice(string.ascii_letters + string.digits) for i in range(8)])
-        api.update_status(status = tweet, in_reply_to_status_id = status.id)
+        send_tweet(tweet, status.id)
 
 class Listener(StreamListener):
     def on_connect(self):
