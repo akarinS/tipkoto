@@ -181,7 +181,7 @@ def on_tweet(status):
             tweet = "@" + screen_name + " tipkotoneの使い方はこちらです！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
 
         elif command[0] in ["follow me", "フォローミー"]:
-            logger.info("%s(@%s) Follow" $ (name, screen_name))
+            logger.info("%s(@%s) Follow" % (name, screen_name))
             
             user = api.get_user(screen_name)
             if not user.following:
