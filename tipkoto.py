@@ -164,7 +164,7 @@ def send_tweet(tweet, status_id):
     api.update_status(status = tweet, in_reply_to_status_id = status_id)
 
 def on_tweet(status):
-    if status.text.find("RT") == -1 and status.text.find("QT") == -1 and status.user.screen_name != "tipkotone":
+    if status.text.find("RT ") == -1 and status.text.find("QT ") == -1 and status.user.screen_name != "tipkotone":
         if status.text.find("@tipkotone") == -1:
             return
 
@@ -181,7 +181,7 @@ def on_tweet(status):
             tweet = "@" + screen_name + " tipkotoneの使い方はこちらです！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
 
         elif command[0] in ["follow me", "フォローミー"]:
-            logger.info("%s(@%s) Follow")
+            logger.info("%s(@%s) Follow" $ (name, screen_name))
             
             user = api.get_user(screen_name)
             if not user.following:
