@@ -164,10 +164,27 @@ def send_tweet(tweet, status_id):
     api.update_status(status = tweet, in_reply_to_status_id = status_id)
 
 def on_tweet(status):
-    if status.text.find("RT ") == -1 and status.text.find("QT ") == -1 and status.user.screen_name != "tipkotone":
-        if status.text.find("@tipkotone") == -1:
+    if status.text.find("RT ") != -1:
+        if status.text.find("RT ") == 0:
             return
 
+        elif status.text.find(" RT ") != -1:
+            return
+
+    if status.text.find("QT ") != -1:
+        if status.text.find("QT ") == 0:
+            return
+
+        elif status.text.find(" QT ") != -1:
+            return
+
+    if status.user.screen_name == "tipkotone":
+        return
+
+    if status.text.find("@tipkotone") == -1:
+        return
+
+    else:
         name = status.user.name
         screen_name = status.user.screen_name
         user_id = "twitter-tipkotone-" + str(status.user.id)
