@@ -34,7 +34,6 @@ api = API(auth)
 logging.config.fileConfig("logging.conf")
 logger = logging.getLogger()
 
-
 def insert_data(user_id):
     database = sqlite3.connect("tipkoto.db")
     db = database.cursor()
@@ -207,7 +206,7 @@ def on_tweet(status):
                 tweet = "@" + screen_name + " フォローしました！"
 
             else:
-                logger.info("--> Already Follow")
+                logger.info("--> Already follow")
                 tweet = "@" + screen_name + " すでにフォローしています！"
 
         elif user_exists(user_id):
