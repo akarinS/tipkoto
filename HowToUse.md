@@ -1,16 +1,12 @@
 使い方
 ======
 
-スペースは半角でお願いします。  
-  
-人への返信で使う場合は、返信先に @tipkotone が含まれた状態ではうまく反応しないので、@tipkotone を返信先から除外してからツイートしてください。（いわゆる巻き込みリプをしないように）
-
 鍵アカウントで使いたい場合は、一度鍵を外して follow me/フォローミー でBotにフォローしてもらってから鍵をつけ直してください。
 
 help/ヘルプ
 -----------
 
-ここへ誘導する
+ここへ誘導する。
 
     @tipkotone help
     @tipkotone ヘルプ
@@ -18,7 +14,7 @@ help/ヘルプ
 hello/hi/address/こんにちは/はじめまして/アドレス
 --------------------------------
 
-このTipBotを使うには先ずこれをする
+このTipBotを使うには先ずこれをする。
 
     @tipkotone hello
     @tipkotone hi
@@ -30,7 +26,7 @@ hello/hi/address/こんにちは/はじめまして/アドレス
 follow me/フォローミー
 ----------------------
 
-フォローしてもらう
+フォローしてもらう。
 
     @tipkotone follow me
     @tipkotone フォローミー
@@ -38,43 +34,52 @@ follow me/フォローミー
 balance/残高
 -------------
 
-残高を確認する
+残高を確認する。
 
     @tipkotone balance
     @tipkotone 残高
+    @tipkotone 残高を教えて
 
 deposit/address/入金/アドレス
 -----------------------------
 
-入金用アドレスを確認する
+入金用アドレスを確認する。
 
     @tipkotone deposit
     @tipkotone 入金
     @tipkotone address
     @tipkotone アドレス
-
+    @tipkotone アドレスなんやったっけ
 
 withdraw/出金
 -------------
 
 出金する。  
 zアドレスへは出金できません。  
-出金額には all が使えます。
+出金額には "all","全額" が使えます。  
+金額とアドレスの順序はどちらでも大丈夫です。
 
     @tipkotone withdraw 10 address
     @tipkotone withdraw all address
     @tipkotone 出金 39 address
-    @tipkotone 出金 all address
+    @tipkotone 出金 全額 address
+
+    @tipkotone withdraw address 10
+    @tipkotone withdraw address all
 
 tip/投げ銭/投銭
 ---------------
 
 投げ銭する。  
 相手がまだ hello/hi/address/こんにちは/はじめまして/アドレス をしていないと投げ銭できません。  
-投げ銭額には all が使えます。
+投げ銭額には "all","全額" が使えます。  
+金額と宛先の順序はどちらでも大丈夫です。
 
     @tipkotone tip 4.649 @to_twitter_account
-    @tipkotone 投げ銭 all @to_twitter_account 全額投げます！！！
+    @tipkotone 投げ銭 全額 @to_twitter_account 全額投げます！！！
+
+    @tipkotone tip @to_twitter_account 1.14114
+    @tipkotone 投銭 @to_twitter_account 39
 
 トラブルシューティング
 ======================
