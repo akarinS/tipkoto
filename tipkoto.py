@@ -125,6 +125,9 @@ def is_amount(argument):
     except ValueError:
         return False
 
+    if "e" in argument.lower():
+        return False
+
     return True
 
 def get_command(text):
