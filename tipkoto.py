@@ -359,7 +359,7 @@ def on_tweet(status):
 
                                 logger.info("--> {0:f}KOTO ".format(amount) + "to %s(@%s)" % (to_name, to_screen_name))
 
-                                tweet = "@" + screen_name + " @" + to_screen_name + " " + name + "さんから" + to_name + "さんへ {0:f}KOTO の投げ銭です！".format(amount)
+                                tweet = "@" + screen_name + " @" + to_screen_name + " " + name + "さんから " + to_name + "さんへ お心付けです！ {0:f}KOTO".format(amount)
 
                             elif change < 0:
                                 logger.info("--> Insufficient balance")
