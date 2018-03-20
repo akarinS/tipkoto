@@ -143,7 +143,8 @@ def get_command(text):
             command[0] = command[0].lower()
 
             if command[0] in ["withdraw", "出金",
-                              "tip", "投げ銭", "投銭"]:
+                              "tip", "投げ銭", "投銭",
+                              "check", "確認"]:
 
                 return command
 
@@ -402,6 +403,41 @@ def on_tweet(status):
                 address = get_address_of(user_id)
                 logger.info("--> " + address)
                 tweet = "@" + screen_name + " " + name + "さんのアドレスはこちらです！ " + address
+
+            elif command[0] in ["check", "確認"]:
+                logger.info("%s(@%s) Check" % (name, screen_name))
+
+                if len(command) < 2:
+                    logger.info("--> Arguments shortage")
+                    tweet = "@" + screen_name + " tipkotoneの使い方はこちらです！ https://github.com/akarinS/tipkoto/blob/master/HowToUse.md"
+
+                elif not command[1].startswith("@"):
+                    logger.info("--> To screen name is incorrect")
+                    tweet = "@" + screen_name + " ユーザー名が間違っています・・・"
+
+                else:
+                    to_screen_name = command[1][1:]
+
+                    try:
+                        to_user = api.get_user(to_screen_name)
+
+                    except:
+                        logger.info("--> To user is not found")
+                        tweet = "@" + screen_name + " 確認相手(@%s)が見つかりませんでした・・・" % (to_screen_name)
+                        send_tweet(tweet, status.id)
+                        return
+
+                    to_name = to_user.name
+                    to_user_id = "twitter-tipkotone-" + str(to_user.id)
+
+                    if user_exists(to_user_id):
+                        logger.info("--> To user already uses tipkotone")
+                        tweet = "@" + screen_name + " %s(@%s)" % (to_name, to_screen_name) + "さんはtipkotoneを使っています！"
+
+                    else:
+                        logger.info("--> To user has not used tipkotone yet")
+                        tweet = "@" + screen_name + " %s(@%s)" % (to_name, to_screen_name) + "さんはtipkotoneをまだ使ってないみたい・・・"
+
 
             elif command[0] in ["hello", "hi", "こんにちは"]:
                 tweet = "@" + screen_name + " こんにちは！"
