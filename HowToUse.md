@@ -81,6 +81,14 @@ tip/投げ銭/投銭
     @tipkotone tip @to_twitter_account 1.14114
     @tipkotone 投銭 @to_twitter_account 39
 
+check/確認
+----------
+
+投げ銭したい相手がtipkotoneを使っているかを確認する。
+
+    @tipkotone check @to_twitter_account
+    @tipkotone 確認 @to_twitter_account
+
 トラブルシューティング
 ======================
 
