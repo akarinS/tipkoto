@@ -158,6 +158,13 @@ def get_command(text):
                     if re.match(cmd, text.lower()):
                         return [cmd]
 
+def round_down(amount_string):
+    if "." in amount_string:
+        return amount_string[:amount_string.find(".") + 9]
+
+    else:
+        return amount_string
+
 def send_tweet(tweet, status_id):
     tweet = tweet + "\n\n" + "".join([random.choice(string.ascii_letters + string.digits) for i in range(8)])
     api.update_status(status = tweet, in_reply_to_status_id = status_id)
@@ -226,7 +233,7 @@ def on_tweet(status):
                                 amount = balance - Decimal("0.0001")
 
                             else:
-                                amount = Decimal("{0:.8f}".format(float(command[1])))
+                                amount = Decimal(round_down(command[1]))
 
                             to_address = command[2]
 
@@ -242,7 +249,7 @@ def on_tweet(status):
                                 amount = balance - Decimal("0.0001")
 
                             else:
-                                amount = Decimal("{0:.8f}".format(float(command[2])))
+                                amount = Decimal(round_down(command[2]))
 
                             to_address = command[1]
 
@@ -294,7 +301,7 @@ def on_tweet(status):
                                 amount = balance - Decimal("0.0001")
 
                             else:
-                                amount = Decimal("{0:.8f}".format(float(command[1])))
+                                amount = Decimal(round_down(command[1]))
 
                             to_screen_name = command[2][1:]
 
@@ -310,7 +317,7 @@ def on_tweet(status):
                                 amount = balance - Decimal("0.0001")
 
                             else:
-                                amount = Decimal("{0:.8f}".format(float(command[2])))
+                                amount = Decimal(round_down(command[2]))
 
                             to_screen_name = command[1][1:]
 
